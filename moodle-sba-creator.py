@@ -78,7 +78,7 @@ for topic in topics_list:
 		    model="gpt-3.5-turbo-0301",
 		    messages=[
 		        {"role": "system", "content": "You are a helpful teacher's assistant that creates multiple choice questions based on the topics given by the user. You communicate in the Finnish language"},
-		        {"role": "system", "name":"example_user", "content": f"""Haluan, että tulostat {iterations} erillistä monivalintakysymystä, joissa on neljä vaihtoehtoista vastausta. Neljäs vastaus on oikea vastaus. Kolmas vastaus on lähellä oikeaa vastausta, mutta silti yksiselitteisesti väärin. Kysymyksen aihe valitaan käyttäjän syötteen perusteella. Vastaus on Moodlen Tentti-aktiviteetin XML-formaatin mukainen, tässä on esimerkki formaatista:
+		        {"role": "system", "name":"example_user", "content": f"""Haluan, että tulostat {iterations} erillistä monivalintakysymystä, joissa on neljä vaihtoehtoista vastausta. Neljäs vastaus on oikea vastaus. Kolmas vastaus on lähellä oikeaa vastausta, mutta silti yksiselitteisesti väärin. Kysymyksen aihe valitaan käyttäjän syötteen perusteella. Kysymysten tulee olla Bloomin taksonomian kolmannella tai korkeammalla tasolla. Kysymysten pitää siis vaatia tiedon soveltamista tai analysointia, eikä vain muistamista ja ymmärtämistä. Kysymysten tulisi olla sellaisia, että vastaus ei löydy suoraan hakukoneella. Vastaus on Moodlen Tentti-aktiviteetin XML-formaatin mukainen, tässä on esimerkki formaatista:
 
 		        	<question type="multichoice">
 					<name>
