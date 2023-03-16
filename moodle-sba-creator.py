@@ -3,54 +3,70 @@ import openai
 from pathlib import Path
 import traceback
 import logging
+import argparse
+
+parser = argparse.ArgumentParser(description='Creates SBA questions in Moodle Quiz XML format from a topic list, using the ChatGPT API.')
+parser.add_argument('topicfile', type=str, metavar='topicfile',
+                    help='Name of the topic file containing one topic per line')
+parser.add_argument('iterations', type=int, metavar='iterations',
+                    help='How many questions per topic should be created')
+parser.add_argument('outputfile', type=str, metavar='outputfile',
+                    help='Name of the file where the questions should be saved')
+parser.add_argument('--debug', help='output everything on stdout')
+parser.add_argument('--samplequestion', type=str, metavar='filename', help='This file specifies a sample question that helps to prime the language model. If there is not one, the default sample question is used instead.')
+args = parser.parse_args()
+
 
 # PARAMETERS: 1. topic file (list of question topics separated by newline) 2. Number of questions per topic 3. name of output xml file
 # Additionally, sample_question.txt for a question to prime the gpt api. If the file doesn't exist, the default sample question is used instead.
 
-topicfile = str(sys.argv[1])
+topicfile = args.topicfile
 openai.api_key = "API KEY HERE"
 
 topics = Path(topicfile).read_text()
 topics_list = topics.split("\n")
 xml_header = '<?xml version="1.0"?>\n<quiz>\n'
 
-iterations = int(sys.argv[2])
+iterations = args.iterations
 
-sample_question_file = Path("sample_question.txt")
+sample_question = """
+	<question type="multichoice">
+			<name>
+				<text>Borneon historia 1</text>
+			</name>
+			<questiontext format="html">
+				<text>Milloin alkaa dokumentoitu historia Borneon saaren ja Kiinan valtakunnan välillä?</text>
+			</questiontext>
+			<answer fraction="0">
+				<text>1600-luvulla, kun Länsi-Borneon sulttaanit toivat työläisiä Kiinasta työskentelemään kaivoksissa.</text>
+					<feedback><text>Väärin. Työläisten maahanmuutto Kiinasta alkoi 1700-luvulla. Lisäksi on olemassa myös aikaisempia historiallisia lähteitä.</text></feedback>
+			</answer>
+			<answer fraction="0">
+				<text>1700-luvulla, kun Länsi-Borneon sulttaanit toivat työläisiä Kiinasta työskentelemään kaivoksissa.</text>
+					<feedback><text>Väärin. Työläisten maahanmuutto Kiinasta alkoi 1700-luvulla, mutta on olemassa myös aikaisempia historiallisia lähteitä.</text></feedback>
+			</answer>
+			<answer fraction="0">
+				<text>1300-luvulla</text>
+				<feedback><text>Melkein oikein. 1300-luvulla Brunein sulttaani vaihtoi uskollisuutensa Majapahitista Kiinan valtakuntaan, mutta on olemassa varhaisempiakin kiinalaisia historiallisia lähteitä, jotka mainitsevat Borneon.</text></feedback>
+			</answer>
+			<answer fraction="100">
+				<text>800-luvulla</text>
+				<feedback><text>Oikein. Kiinalainen käsikirjoitus vuodelta 977 mainitsee saaren nimeltä "P'o-ni".</text></feedback>
+			</answer>
+	</question>
+"""
 
-if sample_question_file.is_file():
-    sample_question = Path(sample_question_file).read_text()
-    print("Custom sample question file found, using it to generate questions.")
+if args.samplequestion:
+	sample_question_file = Path(args.samplequestion)
+	if sample_question_file.is_file():
+		sample_question = Path(sample_question_file).read_text()
+		print("Custom sample question file found, using it to generate questions.")
+	else:
+		print("Sample question file not found. Using the default sample question")
 else:
-    sample_question = """
-		<question type="multichoice">
-				<name>
-					<text>Borneon historia 1</text>
-				</name>
-				<questiontext format="html">
-					<text>Milloin alkaa dokumentoitu historia Borneon saaren ja Kiinan valtakunnan välillä?</text>
-				</questiontext>
-				<answer fraction="0">
-					<text>1600-luvulla, kun Länsi-Borneon sulttaanit toivat työläisiä Kiinasta työskentelemään kaivoksissa.</text>
-						<feedback><text>Väärin. Työläisten maahanmuutto Kiinasta alkoi 1700-luvulla. Lisäksi on olemassa myös aikaisempia historiallisia lähteitä.</text></feedback>
-				</answer>
-				<answer fraction="0">
-					<text>1700-luvulla, kun Länsi-Borneon sulttaanit toivat työläisiä Kiinasta työskentelemään kaivoksissa.</text>
-						<feedback><text>Väärin. Työläisten maahanmuutto Kiinasta alkoi 1700-luvulla, mutta on olemassa myös aikaisempia historiallisia lähteitä.</text></feedback>
-				</answer>
-				<answer fraction="0">
-					<text>1300-luvulla</text>
-					<feedback><text>Melkein oikein. 1300-luvulla Brunein sulttaani vaihtoi uskollisuutensa Majapahitista Kiinan valtakuntaan, mutta on olemassa varhaisempiakin kiinalaisia historiallisia lähteitä, jotka mainitsevat Borneon.</text></feedback>
-				</answer>
-				<answer fraction="100">
-					<text>800-luvulla</text>
-					<feedback><text>Oikein. Kiinalainen käsikirjoitus vuodelta 977 mainitsee saaren nimeltä "P'o-ni".</text></feedback>
-				</answer>
-		</question>
-    """
     print("Sample question file not found. Using the default sample question")
 
-filepath = Path(sys.argv[3])
+filepath = Path(args.outputfile)
 with filepath.open("w", encoding ="utf-8") as f:
     f.write(xml_header)
     f.close()
