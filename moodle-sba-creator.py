@@ -53,7 +53,7 @@ response = openai.ChatCompletion.create(
 			</answer>
 			<answer fraction="0">
     			<text>In the 18th century, when the sultans of Western Borneo imported laborers from China to work in mines.</text>
-   				<feedback><text>Incorrect. The sultans did import laborers, but it already started in the 17th century. Also, there are much earlier historical sources.</text></feedback>
+   				<feedback><text>Incorrect. The sultans did import laborers, but there are earlier historical sources.</text></feedback>
 			</answer>
 			<answer fraction="0">
 				<text>In the 14th century</text>
