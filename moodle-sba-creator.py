@@ -3,12 +3,14 @@ import openai
 
 openai.api_key = "YOUR API KEY HERE"
 
+topic = str(sys.argv[1])
+iterations = int(sys.argv[2])
 
 response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo-0301",
     messages=[
         {"role": "system", "content": "You are a helpful teacher's assistant that creates multiple choice questions based on the topics given by the user."},
-        {"role": "system", "name":"example_user", "content": """I need you to print a single multiple choice question and four alternative answers, the correct answer being the fourth answer. The third answer should be close to a correct answer, but still unequivocally wrong. The topic of the question is selected based on the user input. The output format is correctly formatted Moodle Quiz XML, here's an example of the format:
+        {"role": "system", "name":"example_user", "content": f"""I need you to print {iterations} separate multiple choice questions with four alternative answers, the correct answer being the fourth answer. The third answer should be close to a correct answer, but still unequivocally wrong. The topic of the question is selected based on the user input. The output format is correctly formatted Moodle Quiz XML, here's an example of the format:
 
         	<question type="multichoice">
 			<name>
@@ -62,9 +64,10 @@ response = openai.ChatCompletion.create(
    			<feedback><text>Correct. A Chinese manuscript from the year 977 mentions the island of "P'o-ni".</text></feedback>
 			</answer>
 			</question>"""},
-        {"role": "system", "name":"user", "content": str(sys.argv[1])},
+        {"role": "system", "name":"user", "content": f"""Now, output {iterations} unique questions on this topic: {topic}."""},
     ],
     temperature=0,
+    top_p=1,
 )
 
 result = ''
